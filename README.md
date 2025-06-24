@@ -1,143 +1,188 @@
-# Sistema Hambre Cero 🍽️
+# Sistema Hambre Cero
 
-Sistema de gestión de donaciones de alimentos desarrollado con Spring Boot, JPA y MySQL.
+Sistema de gestión de donaciones de alimentos para combatir el hambre en la comunidad.
 
-## 📋 Descripción
+## 1. Modelo Relacional Normalizado
 
-Este proyecto es un sistema web completo para gestionar donaciones de alimentos, conectando donantes con receptores a través de un sistema eficiente de registro y seguimiento. Implementa todas las operaciones CRUD, procedimientos almacenados y transacciones.
+### Entidades Principales
 
-## 🚀 Tecnologías Utilizadas
+1. **Donante** (3FN)
+   - `id_donante` (PK)
+   - `nombre`
+   - `tipo_documento`
+   - `numero_documento` (Único)
+   - `email`
+   - `telefono`
+   - `total_donaciones` (Derivado)
+   - `total_calorias_donadas` (Derivado)
 
-- **Backend**: Spring Boot 2.7.14
-- **ORM**: Spring Data JPA / Hibernate
-- **Base de Datos**: MySQL 8.0
-- **Frontend**: Thymeleaf + Bootstrap 5
-- **Build**: Maven
-- **Java**: 11
+2. **Receptor** (3FN)
+   - `id_receptor` (PK)
+   - `nombre`
+   - `tipo_documento`
+   - `numero_documento` (Único)
+   - `direccion`
+   - `telefono`
+   - `email`
+   - `id_zona` (FK)
 
-## 📊 Modelo de Base de Datos
+3. **Donacion** (3FN)
+   - `id_donacion` (PK)
+   - `id_donante` (FK)
+   - `id_receptor` (FK)
+   - `fecha`
+   - `estado`
+   - `observaciones`
 
-El sistema está construido sobre un modelo relacional normalizado hasta 3FN con las siguientes entidades:
+4. **DetalleDonacion** (3FN)
+   - `id_detalle` (PK)
+   - `id_donacion` (FK)
+   - `nombre_alimento`
+   - `cantidad`
+   - `unidad_medida`
+   - `calorias_totales`
 
-- **donante**: Personas o empresas que realizan donaciones
-- **receptor**: Beneficiarios de las donaciones
-- **donacion**: Registro de cada donación realizada
-- **detalle_donacion**: Detalles de alimentos en cada donación
-- **zona_entrega**: Zonas geográficas de distribución
+5. **ZonaEntrega** (3FN)
+   - `id_zona` (PK)
+   - `nombre`
+   - `descripcion`
 
-## ⚙️ Configuración del Proyecto
+### Normalización Aplicada
 
-### 1. Prerrequisitos
+1. **Primera Forma Normal (1FN)**
+   - Todas las tablas tienen una clave primaria
+   - No hay grupos repetitivos
+   - Todos los atributos son atómicos
 
-- JDK 11 o superior
-- MySQL 8.0
-- Maven 3.6+
+2. **Segunda Forma Normal (2FN)**
+   - Cumple 1FN
+   - Todos los atributos no clave dependen de toda la clave primaria
 
-### 2. Configuración de Base de Datos
+3. **Tercera Forma Normal (3FN)**
+   - Cumple 2FN
+   - No hay dependencias transitivas
+   - Los campos derivados se calculan mediante triggers o procedimientos
 
-1. Crear la base de datos:
+## 2. Interfaz de Usuario y CRUD
+
+### Operaciones CRUD Implementadas
+
+1. **Donantes**
+   - Crear: Registro de nuevos donantes con validación de documento único
+   - Leer: Lista paginada con búsqueda por nombre
+   - Actualizar: Modificación de datos con validación
+   - Eliminar: Eliminación lógica preservando integridad referencial
+
+2. **Receptores**
+   - CRUD completo con asignación de zonas
+   - Validación de documentos únicos
+   - Gestión de contacto
+
+3. **Donaciones**
+   - Registro mediante procedimiento almacenado transaccional
+   - Seguimiento de estado
+   - Cálculo automático de estadísticas
+
+4. **Zonas de Entrega**
+   - Gestión completa de zonas
+   - Asignación de receptores
+   - Reportes por zona
+
+### Procedimiento Almacenado Principal
+
+`sp_registrar_donacion_completa`: Procedimiento transaccional que:
+
+1. Registra la donación principal
+2. Inserta los detalles de alimentos
+3. Actualiza estadísticas del donante
+4. Maneja errores y rollback
+
+```sql
+DELIMITER //
+CREATE PROCEDURE sp_registrar_donacion_completa(
+    IN p_id_donante INT,
+    IN p_id_receptor INT,
+    IN p_observaciones VARCHAR(255),
+    IN p_nombre_alimento VARCHAR(100),
+    IN p_cantidad DECIMAL(10,2),
+    IN p_unidad_medida VARCHAR(20),
+    IN p_calorias DECIMAL(10,2),
+    OUT p_id_donacion INT,
+    OUT p_mensaje VARCHAR(255)
+)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SET p_mensaje = 'Error al registrar la donación';
+    END;
+
+    START TRANSACTION;
+    
+    -- Lógica de inserción y actualización
+    -- Ver procedimiento_almacenado.sql para detalles completos
+    
+    COMMIT;
+END //
+DELIMITER ;
+```
+
+### Justificación del Procedimiento
+
+1. **Integridad de Datos**: Garantiza que todos los registros relacionados se insertan o ninguno
+2. **Consistencia**: Mantiene las estadísticas del donante actualizadas
+3. **Eficiencia**: Reduce múltiples llamadas a la base de datos
+4. **Manejo de Errores**: Implementa rollback automático en caso de fallos
+
+## Configuración del Proyecto
+
+### Requisitos Previos
+
+- Java JDK 11 o superior
+- MySQL 8.0 o superior
+- Maven 3.6 o superior
+
+### Pasos de Instalación
+
+1. Clonar el repositorio:
+```bash
+git clone https://github.com/Luisop05/hambre0.git
+cd hambre0
+```
+
+2. Configurar la base de datos:
 ```sql
 CREATE DATABASE hambre_cero;
 ```
 
-2. Ejecutar el script de procedimientos almacenados ubicado en:
-```
-src/main/resources/procedimiento_almacenado.sql
-```
-
-### 3. Configuración de la Aplicación
-
-Actualizar las credenciales en `src/main/resources/application.properties`:
-
+3. Configurar `application.properties`:
 ```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/hambre_cero
 spring.datasource.username=tu_usuario
 spring.datasource.password=tu_contraseña
 ```
 
-### 4. Ejecutar la Aplicación
-
+4. Importar esquema y procedimientos:
 ```bash
-mvn clean install
-mvn spring-boot:run
+mysql -u tu_usuario -p hambre_cero < src/main/resources/schema.sql
+mysql -u tu_usuario -p hambre_cero < src/main/resources/procedimiento_almacenado.sql
+```
+
+5. Ejecutar la aplicación:
+```bash
+./mvnw spring-boot:run
 ```
 
 La aplicación estará disponible en: http://localhost:8080
 
-## 🔧 Funcionalidades Implementadas
+## Tecnologías Utilizadas
 
-### CRUD Completo
-- ✅ **Donantes**: Crear, Leer, Actualizar, Eliminar
-- ✅ **Receptores**: Gestión completa
-- ✅ **Donaciones**: Registro con múltiples detalles
-- ✅ **Zonas de Entrega**: Administración de zonas
+- **Backend**: Spring Boot 2.7.14
+- **Base de Datos**: MySQL 8.0
+- **Frontend**: Thymeleaf + Bootstrap 5
+- **ORM**: Spring Data JPA
+- **Build**: Maven
 
-### Procedimientos Almacenados
-- ✅ `sp_registrar_donacion_completa`: Registra donación con transacción
-- ✅ `sp_reporte_donaciones_zona`: Genera reportes por zona y fecha
+## Licencia
 
-### Consultas Avanzadas
-- ✅ JOINs múltiples
-- ✅ Agregaciones y estadísticas
-- ✅ Consultas con parámetros
-
-### Interfaz Web
-- ✅ Dashboard con estadísticas en tiempo real
-- ✅ Formularios validados
-- ✅ Diseño responsive con Bootstrap
-- ✅ Alertas y mensajes de feedback
-
-## 📁 Estructura del Proyecto
-
-```
-hambre0/
-├── src/
-│   └── main/
-│       ├── java/com/hambrecero/
-│       │   ├── controller/     # Controladores MVC
-│       │   ├── entity/         # Entidades JPA
-│       │   ├── repository/     # Repositorios JPA
-│       │   ├── service/        # Lógica de negocio
-│       │   └── HambreCeroApplication.java
-│       └── resources/
-│           ├── templates/      # Vistas Thymeleaf
-│           ├── static/         # CSS, JS
-│           └── application.properties
-└── pom.xml
-```
-
-## 🎯 Endpoints Principales
-
-- `/` - Página principal con estadísticas
-- `/donantes` - Gestión de donantes
-- `/donaciones` - Gestión de donaciones
-- `/donaciones/nueva` - Registrar nueva donación
-- `/reportes` - Visualización de reportes
-
-## 👥 Equipo de Desarrollo
-
-- Proyecto desarrollado para la clase de Bases de Datos
-- Implementa todos los requisitos solicitados:
-  - Modelo normalizado
-  - CRUD completo
-  - Procedimientos almacenados
-  - Transacciones
-  - Interfaz web moderna
-
-## 📝 Notas Adicionales
-
-- El sistema maneja transacciones automáticamente con Spring
-- Los procedimientos almacenados están integrados con JPA
-- La validación se realiza tanto en frontend como backend
-- El sistema es escalable y mantenible
-
-## 🎬 Video de Demostración
-
-Para la sustentación, grabar un video mostrando:
-1. Modelo de base de datos normalizado
-2. Operaciones CRUD funcionando
-3. Ejecución de procedimientos almacenados
-4. Explicación de las herramientas utilizadas
-5. Justificación del procedimiento almacenado
-
----
 Sistema Hambre Cero © 2025 
