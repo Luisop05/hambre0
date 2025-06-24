@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: html(pageTitle=${donante.idDonante != null ? 'Editar Donante' : 'Nuevo Donante'}, content=~{::main}, additionalCss=~{}, additionalScripts=~{})}">
+<body>
+    <main>
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-md-8 mx-auto">
+                    <div class="form-section">
+                        <h2>
+                            <i class="fas fa-user-plus"></i> 
+                            <span th:text="${donante.idDonante != null ? 'Editar Donante' : 'Nuevo Donante'}"></span>
+                        </h2>
+                        <hr>
+                        
+                        <form th:action="@{/donantes/guardar}" th:object="${donante}" method="post">
+                            <input type="hidden" th:field="*{idDonante}" th:if="${donante.idDonante != null}">
+                            
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label for="nombre" class="form-label">Nombre Completo *</label>
+                                    <input type="text" class="form-control" id="nombre" th:field="*{nombre}" 
+                                           placeholder="Ingrese el nombre completo" required>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('nombre')}" 
+                                         th:errors="*{nombre}"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="tipoDocumento" class="form-label">Tipo de Documento *</label>
+                                    <select class="form-control" id="tipoDocumento" th:field="*{tipoDocumento}" required>
+                                        <option value="">Seleccione...</option>
+                                        <option value="CC">Cédula de Ciudadanía</option>
+                                        <option value="CE">Cédula de Extranjería</option>
+                                        <option value="NIT">NIT</option>
+                                        <option value="PAS">Pasaporte</option>
+                                    </select>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('tipoDocumento')}" 
+                                         th:errors="*{tipoDocumento}"></div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="numeroDocumento" class="form-label">Número de Documento *</label>
+                                    <input type="text" class="form-control" id="numeroDocumento" 
+                                           th:field="*{numeroDocumento}" placeholder="Ingrese el número" required>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('numeroDocumento')}" 
+                                         th:errors="*{numeroDocumento}"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" th:field="*{email}" 
+                                           placeholder="correo@ejemplo.com">
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" 
+                                         th:errors="*{email}"></div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="telefono" class="form-label">Teléfono</label>
+                                    <input type="tel" class="form-control" id="telefono" th:field="*{telefono}" 
+                                           placeholder="3001234567">
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('telefono')}" 
+                                         th:errors="*{telefono}"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Campos ocultos para estadísticas -->
+                            <input type="hidden" th:field="*{totalDonaciones}" th:if="${donante.idDonante != null}">
+                            <input type="hidden" th:field="*{totalCaloriasDonadas}" th:if="${donante.idDonante != null}">
+                            
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> Guardar
+                                    </button>
+                                    <a th:href="@{/donantes}" class="btn btn-secondary">
+                                        <i class="fas fa-times"></i> Cancelar
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html> 

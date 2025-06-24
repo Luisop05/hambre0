@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle} ? ${pageTitle} + ' - Hambre Cero' : 'Sistema Hambre Cero'">Sistema Hambre Cero</title>
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.0/css/bootstrap.min.css}">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    
+    <!-- Additional CSS -->
+    <th:block th:replace="${additionalCss}"></th:block>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" th:href="@{/}">
+                <i class="fas fa-hands-helping"></i> Hambre Cero
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/}" th:classappend="${#request.requestURI == '/'} ? 'active'">
+                            <i class="fas fa-home"></i> Inicio
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="donacionesDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-gift"></i> Donaciones
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" th:href="@{/donaciones}">Ver Todas</a></li>
+                            <li><a class="dropdown-item" th:href="@{/donaciones/nueva}">Nueva Donación</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" th:href="@{/donaciones/estadisticas}">Estadísticas</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/donantes}">
+                            <i class="fas fa-users"></i> Donantes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/receptores}">
+                            <i class="fas fa-user-friends"></i> Receptores
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/zonas}">
+                            <i class="fas fa-map-marker-alt"></i> Zonas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/reportes}">
+                            <i class="fas fa-chart-bar"></i> Reportes
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Alerts -->
+    <div class="container mt-3">
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle"></i> <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle"></i> <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${warning}" class="alert alert-warning alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle"></i> <span th:text="${warning}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <main th:replace="${content}">
+        <p>Layout content</p>
+    </main>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Sistema Hambre Cero - Proyecto de Bases de Datos</p>
+            <p>Desarrollado con Spring Boot, JPA y MySQL</p>
+        </div>
+    </footer>
+    
+    <!-- jQuery -->
+    <script th:src="@{/webjars/jquery/3.6.4/jquery.min.js}"></script>
+    
+    <!-- Bootstrap JS -->
+    <script th:src="@{/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js}"></script>
+    
+    <!-- Additional Scripts -->
+    <th:block th:replace="${additionalScripts}"></th:block>
+</body>
+</html> 

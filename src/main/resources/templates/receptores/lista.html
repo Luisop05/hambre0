@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/layout :: head(title='Lista de Receptores')"></head>
+<body>
+    <div th:replace="fragments/layout :: header"></div>
+    
+    <div class="container mt-4">
+        <div class="row mb-3">
+            <div class="col">
+                <h2>Lista de Receptores</h2>
+            </div>
+            <div class="col text-end">
+                <a th:href="@{/receptores/nuevo}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Nuevo Receptor
+                </a>
+            </div>
+        </div>
+
+        <div th:if="${success != null}" class="alert alert-success alert-dismissible fade show" role="alert">
+            [[${success}]]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div th:if="${error != null}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            [[${error}]]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            <div th:each="receptor : ${receptores}" class="col">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${receptor.nombre}">Nombre del Receptor</h5>
+                        <p class="card-text">
+                            <strong>Dirección:</strong> <span th:text="${receptor.direccion}"></span><br>
+                            <strong>Teléfono:</strong> <span th:text="${receptor.telefono}"></span><br>
+                            <strong>Zona:</strong> <span th:text="${receptor.zonaEntrega?.nombreZona}"></span>
+                        </p>
+                    </div>
+                    <div class="card-footer bg-transparent border-top-0">
+                        <div class="btn-group" role="group">
+                            <a th:href="@{/receptores/ver/{id}(id=${receptor.idReceptor})}" 
+                               class="btn btn-info btn-sm">
+                                <i class="fas fa-eye"></i> Ver
+                            </a>
+                            <a th:href="@{/receptores/editar/{id}(id=${receptor.idReceptor})}" 
+                               class="btn btn-warning btn-sm">
+                                <i class="fas fa-edit"></i> Editar
+                            </a>
+                            <a th:href="@{/receptores/eliminar/{id}(id=${receptor.idReceptor})}" 
+                               class="btn btn-danger btn-sm"
+                               onclick="return confirm('¿Estás seguro de que deseas eliminar este receptor?')">
+                                <i class="fas fa-trash"></i> Eliminar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(receptores)}" class="alert alert-info mt-3">
+            No hay receptores registrados.
+        </div>
+    </div>
+
+    <div th:replace="fragments/layout :: footer"></div>
+    <div th:replace="fragments/layout :: scripts"></div>
+</body>
+</html> 

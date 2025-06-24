@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: html(pageTitle='Reportes', content=~{::main}, additionalCss=~{}, additionalScripts=~{})}">
+<body>
+    <main>
+        <div class="container py-4">
+            <!-- Botón Atrás -->
+            <div class="mb-3">
+                <a href="javascript:history.back()" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Atrás
+                </a>
+            </div>
+
+            <h2 class="mb-4">
+                <i class="fas fa-chart-bar"></i> Reportes y Estadísticas
+            </h2>
+
+            <!-- Resumen General -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Resumen General</h5>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="border-start border-4 border-primary p-3">
+                                        <h6>Total Donaciones</h6>
+                                        <h3 th:text="${estadisticas['total_donaciones']}">0</h3>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="border-start border-4 border-success p-3">
+                                        <h6>Donaciones Entregadas</h6>
+                                        <h3 th:text="${estadisticas['donaciones_entregadas']}">0</h3>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="border-start border-4 border-warning p-3">
+                                        <h6>Donaciones Pendientes</h6>
+                                        <h3 th:text="${estadisticas['donaciones_pendientes']}">0</h3>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="border-start border-4 border-danger p-3">
+                                        <h6>Total Calorías</h6>
+                                        <h3 th:text="${#numbers.formatDecimal(estadisticas['total_calorias'], 0, 0)}">0</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reporte por Zona -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Reporte por Zona</h5>
+                            <form th:action="@{/reportes/zona}" method="post" class="row g-3 mb-4">
+                                <div class="col-md-5">
+                                    <label for="fechaInicio" class="form-label">Fecha Inicio</label>
+                                    <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" 
+                                           th:value="${#temporals.format(fechaInicio, 'yyyy-MM-dd')}" required>
+                                </div>
+                                <div class="col-md-5">
+                                    <label for="fechaFin" class="form-label">Fecha Fin</label>
+                                    <input type="date" class="form-control" id="fechaFin" name="fechaFin" 
+                                           th:value="${#temporals.format(fechaFin, 'yyyy-MM-dd')}" required>
+                                </div>
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary w-100">Generar Reporte</button>
+                                </div>
+                            </form>
+
+                            <div class="table-responsive" th:if="${reporteZonas != null}">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Zona</th>
+                                            <th>Total Donaciones</th>
+                                            <th>Total Calorías</th>
+                                            <th>Promedio Calorías</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="reporte : ${reporteZonas}">
+                                            <td th:text="${reporte['nombre_zona']}">Zona</td>
+                                            <td th:text="${reporte['total_donaciones']}">0</td>
+                                            <td th:text="${#numbers.formatDecimal(reporte['total_calorias'], 0, 0)}">0</td>
+                                            <td th:text="${#numbers.formatDecimal(reporte['promedio_calorias'], 0, 0)}">0</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html> 

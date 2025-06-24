@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <!-- Fragmento para el botón atrás -->
+    <div th:fragment="boton-atras" class="mb-3">
+        <a href="javascript:history.back()" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Atrás
+        </a>
+    </div>
+
+    <!-- Fragmento para el encabezado de la lista -->
+    <div th:fragment="encabezado-lista(titulo, icono)" class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i th:class="${'fas fa-' + icono}"></i>
+            <span th:text="${titulo}">Título</span>
+        </h2>
+        <div th:if="${showAddButton}" class="text-end">
+            <a th:href="@{${addButtonUrl}}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Agregar
+            </a>
+        </div>
+    </div>
+
+    <!-- Fragmento para la tabla estándar -->
+    <div th:fragment="tabla-estandar" class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th th:each="columna : ${columnas}" th:text="${columna}">Columna</th>
+                            <th th:if="${showActions}">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="item : ${items}">
+                            <td th:each="campo : ${campos}" th:text="${item[campo]}">Valor</td>
+                            <td th:if="${showActions}" class="text-end">
+                                <a th:if="${showView}" th:href="@{${viewUrl}(id=${item.id})}" class="btn btn-info btn-sm">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a th:if="${showEdit}" th:href="@{${editUrl}(id=${item.id})}" class="btn btn-warning btn-sm">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form th:if="${showDelete}" th:action="@{${deleteUrl}}" method="post" class="d-inline">
+                                    <input type="hidden" name="id" th:value="${item.id}" />
+                                    <button type="submit" class="btn btn-danger btn-sm" 
+                                            onclick="return confirm('¿Está seguro de eliminar este registro?')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr th:if="${items == null or #lists.isEmpty(items)}">
+                            <td th:colspan="${#lists.size(columnas) + (showActions ? 1 : 0)}" class="text-center">
+                                No hay registros disponibles
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

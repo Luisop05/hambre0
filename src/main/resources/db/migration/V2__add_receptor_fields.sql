@@ -1,0 +1,4 @@
+ALTER TABLE receptor
+ADD COLUMN direccion VARCHAR(200),
+ADD COLUMN telefono VARCHAR(20),
+ADD COLUMN email VARCHAR(100); 

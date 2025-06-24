@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: html(pageTitle='Donantes', content=~{::main}, additionalCss=~{}, additionalScripts=~{})}">
+<body>
+    <main>
+        <div class="container py-4">
+            <!-- Botón Atrás -->
+            <div th:replace="~{fragments/lista :: boton-atras}"></div>
+
+            <!-- Encabezado -->
+            <div th:replace="~{fragments/lista :: encabezado-lista(titulo='Gestión de Donantes', icono='users')}" 
+                 th:with="showAddButton=true, addButtonUrl=@{/donantes/nuevo}">
+            </div>
+            
+            <!-- Barra de búsqueda -->
+            <div class="row mb-4">
+                <div class="col-md-6 ms-auto">
+                    <form th:action="@{/donantes/buscar}" method="get" class="d-flex">
+                        <input type="text" name="nombre" class="form-control me-2" 
+                               placeholder="Buscar por nombre..." th:value="${busqueda}">
+                        <button type="submit" class="btn btn-outline-secondary">
+                            <i class="fas fa-search"></i> Buscar
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Tabla de Donantes -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Tipo Doc.</th>
+                                    <th>Número Documento</th>
+                                    <th>Email</th>
+                                    <th>Teléfono</th>
+                                    <th>Total Donaciones</th>
+                                    <th>Calorías Donadas</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="donante : ${donantes}" th:if="${!donantes.isEmpty()}">
+                                    <td th:text="${donante.idDonante}">1</td>
+                                    <td th:text="${donante.nombre}">Nombre</td>
+                                    <td th:text="${donante.tipoDocumento}">DNI</td>
+                                    <td th:text="${donante.numeroDocumento}">12345678</td>
+                                    <td>
+                                        <a th:if="${donante.email}" th:href="'mailto:' + ${donante.email}" 
+                                           th:text="${donante.email}">email@example.com</a>
+                                        <span th:unless="${donante.email}">-</span>
+                                    </td>
+                                    <td th:text="${donante.telefono ?: '-'}">123456789</td>
+                                    <td>
+                                        <span class="badge bg-info" th:text="${donante.totalDonaciones}">0</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-success" 
+                                              th:text="${#numbers.formatDecimal(donante.totalCaloriasDonadas, 0, 0)}">0</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <a th:href="@{/donantes/ver/{id}(id=${donante.idDonante})}" 
+                                           class="btn btn-info btn-sm text-white" title="Ver detalles">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a th:href="@{/donantes/editar/{id}(id=${donante.idDonante})}" 
+                                           class="btn btn-warning btn-sm" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form th:action="@{/donantes/eliminar}" method="post" class="d-inline">
+                                            <input type="hidden" name="id" th:value="${donante.idDonante}" />
+                                            <button type="submit" class="btn btn-danger btn-sm" 
+                                                    onclick="return confirm('¿Está seguro de eliminar este donante?')"
+                                                    title="Eliminar">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Estado vacío -->
+            <div th:if="${donantes.isEmpty()}" class="text-center py-5">
+                <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                <h4>No hay donantes registrados</h4>
+                <p th:if="${busqueda}">No se encontraron donantes con el nombre: <strong th:text="${busqueda}"></strong></p>
+                <p th:unless="${busqueda}">Comienza registrando el primer donante</p>
+                <a th:href="@{/donantes/nuevo}" class="btn btn-primary mt-3">
+                    <i class="fas fa-plus"></i> Registrar Donante
+                </a>
+            </div>
+        </div>
+    </main>
+</body>
+</html> 

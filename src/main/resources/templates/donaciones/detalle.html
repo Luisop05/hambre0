@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Detalle de la Donación</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        .donation-card {
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+            border-top: 5px solid #17a2b8;
+        }
+        .donation-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .donation-icon {
+            background-color: #e9ecef;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+        }
+        .donation-icon i {
+            font-size: 2.5rem;
+            color: #17a2b8;
+        }
+        .donation-title {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 2rem;
+            font-weight: 600;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .info-item {
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #17a2b8;
+        }
+        .info-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .info-label i {
+            color: #17a2b8;
+        }
+        .info-value {
+            color: #2c3e50;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        .details-card {
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        .details-title {
+            color: #2c3e50;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .badge {
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-radius: 20px;
+        }
+        .badge-pendiente {
+            background-color: #ffc107;
+            color: #000;
+        }
+        .badge-entregado {
+            background-color: #28a745;
+            color: #fff;
+        }
+        .table {
+            margin-bottom: 0;
+        }
+        .table th {
+            background-color: #f8f9fa;
+            color: #2c3e50;
+            font-weight: 600;
+            border-bottom: 2px solid #dee2e6;
+        }
+        .btn-action {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        .btn-action:hover {
+            transform: translateY(-2px);
+        }
+        .observaciones {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div th:fragment="content">
+        <div class="container mt-4">
+            <!-- Información Principal -->
+            <div class="donation-card">
+                <div class="donation-header">
+                    <div class="donation-icon">
+                        <i class="fas fa-gift"></i>
+                    </div>
+                    <div>
+                        <h1 class="donation-title">
+                            Donación #<span th:text="${donacion.idDonacion}"></span>
+                        </h1>
+                        <span th:class="${'badge ' + 
+                            (donacion.estado == 'Pendiente' ? 'badge-pendiente' : 
+                             donacion.estado == 'Entregado' ? 'badge-entregado' : 'bg-secondary')}"
+                              th:text="${donacion.estado}">
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-calendar"></i>
+                            <span>Fecha</span>
+                        </div>
+                        <div class="info-value" th:text="${#temporals.format(donacion.fecha, 'dd/MM/yyyy')}"></div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-user"></i>
+                            <span>Donante</span>
+                        </div>
+                        <div class="info-value">
+                            <a th:href="@{/donantes/ver/{id}(id=${donacion.donante.idDonante})}" 
+                               th:text="${donacion.donante.nombre}"
+                               class="text-decoration-none text-primary"></a>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-user-friends"></i>
+                            <span>Receptor</span>
+                        </div>
+                        <div class="info-value">
+                            <a th:href="@{/receptores/ver/{id}(id=${donacion.receptor.idReceptor})}" 
+                               th:text="${donacion.receptor.nombre}"
+                               class="text-decoration-none text-primary"></a>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-fire"></i>
+                            <span>Calorías Totales</span>
+                        </div>
+                        <div class="info-value">
+                            <span th:text="${#numbers.formatDecimal(donacion.totalCalorias, 0, 'COMMA', 2, 'POINT')}"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="observaciones" th:if="${donacion.observaciones}">
+                    <div class="info-label">
+                        <i class="fas fa-comment"></i>
+                        <span>Observaciones</span>
+                    </div>
+                    <p class="mb-0" th:text="${donacion.observaciones}"></p>
+                </div>
+            </div>
+
+            <!-- Detalles de la Donación -->
+            <div class="details-card">
+                <h2 class="details-title">
+                    <i class="fas fa-box-open"></i>
+                    <span>Detalles de Alimentos</span>
+                </h2>
+                
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Alimento</th>
+                                <th>Cantidad</th>
+                                <th>Unidad</th>
+                                <th>Calorías</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="detalle : ${donacion.detalles}">
+                                <td th:text="${detalle.nombreAlimento}"></td>
+                                <td th:text="${detalle.cantidad}"></td>
+                                <td th:text="${detalle.unidadMedida}"></td>
+                                <td th:text="${#numbers.formatDecimal(detalle.caloriasTotales, 0, 'COMMA', 2, 'POINT')}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="d-flex gap-3 mb-4">
+                <a th:href="@{/donaciones}" class="btn btn-action btn-secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Volver</span>
+                </a>
+                <a th:if="${donacion.estado == 'Pendiente'}"
+                   th:href="@{/donaciones/actualizar-estado/{id}(id=${donacion.idDonacion})}" 
+                   class="btn btn-action btn-warning">
+                    <i class="fas fa-sync-alt"></i>
+                    <span>Actualizar Estado</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

@@ -1,88 +1,126 @@
 package com.hambrecero.service;
 
-import com.hambrecero.dao.DonacionDAO;
-import com.hambrecero.dao.DonanteDAO;
-import com.hambrecero.dto.DonacionDTO;
-import com.hambrecero.dto.DonanteDTO;
+import com.hambrecero.entity.Donacion;
+import com.hambrecero.entity.DetalleDonacion;
+import com.hambrecero.repository.DonacionRepository;
+import com.hambrecero.repository.DonanteRepository;
+import com.hambrecero.repository.ReceptorRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Connection;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
+@Service
+@Transactional
 public class DonacionService {
-    private DonacionDAO donacionDAO;
-    private DonanteDAO donanteDAO;
-
-    public DonacionService(Connection connection) {
-        this.donacionDAO = new DonacionDAO(connection);
-        this.donanteDAO = new DonanteDAO(connection);
+    
+    @Autowired
+    private DonacionRepository donacionRepository;
+    
+    @Autowired
+    private DonanteRepository donanteRepository;
+    
+    @Autowired
+    private ReceptorRepository receptorRepository;
+    
+    public List<Donacion> findAll() {
+        return donacionRepository.findAllWithDetails();
     }
-
-    // Crear una nueva donación
-    public DonacionDTO crearDonacion(int idDonante, int idReceptor, String observaciones) {
-        DonacionDTO nuevaDonacion = new DonacionDTO();
-        nuevaDonacion.setFecha(LocalDate.now());
-        nuevaDonacion.setIdDonante(idDonante);
-        nuevaDonacion.setIdReceptor(idReceptor);
-        nuevaDonacion.setEstado("Pendiente");
-        nuevaDonacion.setObservaciones(observaciones);
-
-        return donacionDAO.crear(nuevaDonacion);
+    
+    public Optional<Donacion> findById(Integer id) {
+        return donacionRepository.findById(id);
     }
-
-    // Actualizar estado de donación
-    public boolean actualizarEstadoDonacion(int idDonacion, String nuevoEstado, String observaciones) {
-        DonacionDTO donacion = donacionDAO.obtenerPorId(idDonacion);
-
-        if (donacion != null) {
+    
+    public List<Donacion> findByEstado(String estado) {
+        return donacionRepository.findByEstado(estado);
+    }
+    
+    public List<Donacion> findByDonante(Integer idDonante) {
+        return donacionRepository.findByDonanteIdDonante(idDonante);
+    }
+    
+    public List<Donacion> findByReceptor(Integer idReceptor) {
+        return donacionRepository.findByReceptorIdReceptor(idReceptor);
+    }
+    
+    public List<Donacion> findByFechaRange(LocalDate fechaInicio, LocalDate fechaFin) {
+        return donacionRepository.findByFechaBetween(fechaInicio, fechaFin);
+    }
+    
+    @Transactional
+    public Donacion crearDonacionCompleta(Integer idDonante, Integer idReceptor, 
+                                          String observaciones, List<DetalleDonacion> detalles) {
+        // Validar donante y receptor
+        var donante = donanteRepository.findById(idDonante)
+                .orElseThrow(() -> new RuntimeException("Donante no encontrado"));
+        var receptor = receptorRepository.findById(idReceptor)
+                .orElseThrow(() -> new RuntimeException("Receptor no encontrado"));
+        
+        // Crear la donación
+        Donacion donacion = new Donacion(donante, receptor, observaciones);
+        
+        // Agregar detalles
+        for (DetalleDonacion detalle : detalles) {
+            donacion.addDetalle(detalle);
+        }
+        
+        // Guardar la donación
+        donacion = donacionRepository.save(donacion);
+        
+        // Actualizar estadísticas del donante
+        donante.setTotalDonaciones(donante.getTotalDonaciones() + 1);
+        donante.setTotalCaloriasDonadas(donante.getTotalCaloriasDonadas() + donacion.getTotalCalorias());
+        donanteRepository.save(donante);
+        
+        return donacion;
+    }
+    
+    @Transactional
+    public boolean actualizarEstadoDonacion(Integer idDonacion, String nuevoEstado, String observaciones) {
+        Optional<Donacion> donacionOpt = donacionRepository.findById(idDonacion);
+        if (donacionOpt.isPresent()) {
+            Donacion donacion = donacionOpt.get();
             donacion.setEstado(nuevoEstado);
             donacion.setObservaciones(observaciones);
-
-            DonacionDTO actualizada = donacionDAO.actualizar(donacion);
-            return actualizada != null;
+            donacionRepository.save(donacion);
+            return true;
         }
-
         return false;
     }
-
-    // Obtener estadísticas generales
+    
+    public void deleteById(Integer id) {
+        if (!donacionRepository.existsById(id)) {
+            throw new RuntimeException("Donación no encontrada con ID: " + id);
+        }
+        donacionRepository.deleteById(id);
+    }
+    
     public Map<String, Object> obtenerEstadisticas() {
-        Map<String, Object> estadisticas = new HashMap<>();
-
-        List<DonacionDTO> todasLasDonaciones = donacionDAO.obtenerTodos();
-
-        int totalDonaciones = todasLasDonaciones.size();
-        double totalCalorias = todasLasDonaciones.stream()
-                .mapToDouble(DonacionDTO::getTotalCalorias)
-                .sum();
-
-        long donacionesEntregadas = todasLasDonaciones.stream()
-                .filter(d -> "Entregado".equals(d.getEstado()))
-                .count();
-
-        long donacionesPendientes = todasLasDonaciones.stream()
-                .filter(d -> "Pendiente".equals(d.getEstado()))
-                .count();
-
-        estadisticas.put("totalDonaciones", totalDonaciones);
-        estadisticas.put("totalCalorias", totalCalorias);
-        estadisticas.put("donacionesEntregadas", donacionesEntregadas);
-        estadisticas.put("donacionesPendientes", donacionesPendientes);
-        estadisticas.put("porcentajeEntregadas",
-                totalDonaciones > 0 ? (donacionesEntregadas * 100.0 / totalDonaciones) : 0);
-
-        return estadisticas;
+        Map<String, Object> stats = new HashMap<>();
+        
+        Long totalDonaciones = donacionRepository.count();
+        Long donacionesEntregadas = donacionRepository.countByEstado("Entregado");
+        Long donacionesPendientes = donacionRepository.countByEstado("Pendiente");
+        Double totalCalorias = donacionRepository.sumCaloriasEntregadas();
+        
+        stats.put("totalDonaciones", totalDonaciones);
+        stats.put("donacionesEntregadas", donacionesEntregadas);
+        stats.put("donacionesPendientes", donacionesPendientes);
+        stats.put("totalCalorias", totalCalorias != null ? totalCalorias : 0.0);
+        
+        double porcentajeEntregadas = totalDonaciones > 0 ? 
+            (donacionesEntregadas * 100.0 / totalDonaciones) : 0.0;
+        stats.put("porcentajeEntregadas", porcentajeEntregadas);
+        
+        return stats;
     }
-
-    // Obtener donaciones por estado
-    public List<DonacionDTO> obtenerDonacionesPorEstado(String estado) {
-        return donacionDAO.obtenerPorEstado(estado);
-    }
-
-    // Obtener todos los donantes
-    public List<DonanteDTO> obtenerTodosLosDonantes() {
-        return donanteDAO.obtenerTodos();
+    
+    public List<Donacion> obtenerUltimasDonaciones(int cantidad) {
+        return donacionRepository.findTop10ByOrderByFechaDesc();
     }
 }

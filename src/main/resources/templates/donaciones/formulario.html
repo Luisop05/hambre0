@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: html(pageTitle='Nueva Donación', content=~{::main}, additionalCss=~{}, additionalScripts=~{::script})}">
+<body>
+    <main>
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-md-10 mx-auto">
+                    <div class="form-section">
+                        <h2><i class="fas fa-gift"></i> Registrar Nueva Donación</h2>
+                        <hr>
+                        
+                        <form th:action="@{/donaciones/guardar}" method="post">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="idDonante" class="form-label">Donante *</label>
+                                    <select class="form-control" id="idDonante" name="idDonante" required>
+                                        <option value="">Seleccione un donante...</option>
+                                        <option th:each="donante : ${donantes}" 
+                                                th:value="${donante.idDonante}"
+                                                th:text="${donante.nombre + ' - ' + donante.numeroDocumento}">
+                                        </option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="idReceptor" class="form-label">Receptor *</label>
+                                    <select class="form-control" id="idReceptor" name="idReceptor" required>
+                                        <option value="">Seleccione un receptor...</option>
+                                        <option th:each="receptor : ${receptores}" 
+                                                th:value="${receptor.idReceptor}"
+                                                th:text="${receptor.nombre + ' - ' + receptor.numeroDocumento}">
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label for="observaciones" class="form-label">Observaciones</label>
+                                    <textarea class="form-control" id="observaciones" name="observaciones" 
+                                              rows="2" placeholder="Observaciones adicionales..."></textarea>
+                                </div>
+                            </div>
+                            
+                            <hr>
+                            <h4>Detalles de la Donación</h4>
+                            
+                            <div id="detallesContainer">
+                                <div class="detalle-item border rounded p-3 mb-3">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <label class="form-label">Alimento *</label>
+                                            <input type="text" class="form-control" name="nombreAlimento[]" 
+                                                   placeholder="Ej: Arroz" required>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label">Cantidad *</label>
+                                            <input type="number" class="form-control" name="cantidad[]" 
+                                                   step="0.01" min="0.01" placeholder="0.00" required>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label">Unidad *</label>
+                                            <select class="form-control" name="unidadMedida[]" required>
+                                                <option value="">Seleccione...</option>
+                                                <option value="kg">Kilogramos</option>
+                                                <option value="lb">Libras</option>
+                                                <option value="g">Gramos</option>
+                                                <option value="l">Litros</option>
+                                                <option value="u">Unidades</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Calorías Totales *</label>
+                                            <input type="number" class="form-control" name="caloriasTotales[]" 
+                                                   step="0.01" min="0" placeholder="0.00" required>
+                                        </div>
+                                        <div class="col-md-2 d-flex align-items-end">
+                                            <button type="button" class="btn btn-danger btn-sm" onclick="eliminarDetalle(this)">
+                                                <i class="fas fa-trash"></i> Eliminar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button type="button" class="btn btn-success mb-3" onclick="agregarDetalle()">
+                                <i class="fas fa-plus"></i> Agregar Alimento
+                            </button>
+                            
+                            <hr>
+                            
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-save"></i> Guardar Donación
+                                    </button>
+                                    <a th:href="@{/donaciones}" class="btn btn-secondary btn-lg">
+                                        <i class="fas fa-times"></i> Cancelar
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <script th:fragment="script">
+        function agregarDetalle() {
+            const container = document.getElementById('detallesContainer');
+            const detalleItem = document.querySelector('.detalle-item').cloneNode(true);
+            
+            // Limpiar valores
+            detalleItem.querySelectorAll('input').forEach(input => input.value = '');
+            detalleItem.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
+            
+            container.appendChild(detalleItem);
+        }
+        
+        function eliminarDetalle(button) {
+            const detalles = document.querySelectorAll('.detalle-item');
+            if (detalles.length > 1) {
+                button.closest('.detalle-item').remove();
+            } else {
+                alert('Debe mantener al menos un detalle de donación');
+            }
+        }
+    </script>
+</body>
+</html> 

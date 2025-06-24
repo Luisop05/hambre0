@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/layout :: head(title=${zona.idZona == null ? 'Nueva Zona' : 'Editar Zona'})"></head>
+<body>
+    <div th:replace="fragments/layout :: header"></div>
+    
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="card-title mb-0" th:text="${zona.idZona == null ? 'Nueva Zona' : 'Editar Zona'}">
+                            Nueva/Editar Zona
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/zonas/guardar}" th:object="${zona}" method="post">
+                            <input type="hidden" th:field="*{idZona}" />
+                            
+                            <div class="mb-3">
+                                <label for="nombreZona" class="form-label">Nombre de la Zona</label>
+                                <input type="text" class="form-control" id="nombreZona" th:field="*{nombreZona}"
+                                       th:classappend="${#fields.hasErrors('nombreZona')} ? 'is-invalid'" />
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('nombreZona')}"
+                                     th:errors="*{nombreZona}">Error en el nombre</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="ciudad" class="form-label">Ciudad</label>
+                                <input type="text" class="form-control" id="ciudad" th:field="*{ciudad}"
+                                       th:classappend="${#fields.hasErrors('ciudad')} ? 'is-invalid'" />
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('ciudad')}"
+                                     th:errors="*{ciudad}">Error en la ciudad</div>
+                            </div>
+                            
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a th:href="@{/zonas}" class="btn btn-secondary me-md-2">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Guardar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="fragments/layout :: footer"></div>
+    <div th:replace="fragments/layout :: scripts"></div>
+</body>
+</html> 

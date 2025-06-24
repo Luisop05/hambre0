@@ -1,0 +1,125 @@
+/* Estilos personalizados para el Sistema Hambre Cero */
+
+:root {
+    --primary-color: #2ecc71;
+    --secondary-color: #3498db;
+    --danger-color: #e74c3c;
+    --warning-color: #f39c12;
+    --dark-color: #2c3e50;
+    --light-color: #ecf0f1;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    color: var(--primary-color) !important;
+}
+
+.hero-section {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    padding: 60px 0;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.hero-section h1 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    text-align: center;
+    transition: transform 0.3s;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.stat-label {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: #27ae60;
+    border-color: #27ae60;
+}
+
+.table-actions {
+    white-space: nowrap;
+}
+
+.badge-pendiente {
+    background-color: var(--warning-color);
+}
+
+.badge-entregado {
+    background-color: var(--primary-color);
+}
+
+.form-section {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.alert {
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+footer {
+    background-color: var(--dark-color);
+    color: white;
+    padding: 20px 0;
+    margin-top: 50px;
+    text-align: center;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #7f8c8d;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    margin-bottom: 20px;
+}
+
+.detail-card {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.detail-card h5 {
+    color: var(--dark-color);
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 10px;
+} 

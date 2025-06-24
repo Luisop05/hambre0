@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Actualizar Estado de Donación</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        .form-card {
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+            border-top: 5px solid #ffc107;
+        }
+        .form-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .form-icon {
+            background-color: #fff3cd;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+        }
+        .form-icon i {
+            font-size: 2rem;
+            color: #ffc107;
+        }
+        .form-title {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+        .info-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        .info-value {
+            color: #2c3e50;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-label {
+            color: #495057;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+            padding: 10px 15px;
+        }
+        .form-control:focus {
+            border-color: #ffc107;
+            box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+        }
+        .btn-action {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        .btn-action:hover {
+            transform: translateY(-2px);
+        }
+        .badge {
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-radius: 20px;
+        }
+        .badge-pendiente {
+            background-color: #ffc107;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <div th:fragment="content">
+        <div class="container mt-4">
+            <div class="form-card">
+                <div class="form-header">
+                    <div class="form-icon">
+                        <i class="fas fa-sync-alt"></i>
+                    </div>
+                    <h1 class="form-title">
+                        Actualizar Estado de Donación #<span th:text="${donacion.idDonacion}"></span>
+                    </h1>
+                </div>
+
+                <!-- Información Actual -->
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Donante</span>
+                        <span class="info-value" th:text="${donacion.donante.nombre}"></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Receptor</span>
+                        <span class="info-value" th:text="${donacion.receptor.nombre}"></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Estado Actual</span>
+                        <span class="badge badge-pendiente" th:text="${donacion.estado}"></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Fecha</span>
+                        <span class="info-value" th:text="${#temporals.format(donacion.fecha, 'dd/MM/yyyy')}"></span>
+                    </div>
+                </div>
+
+                <!-- Formulario -->
+                <form th:action="@{/donaciones/actualizar-estado}" method="post">
+                    <input type="hidden" name="idDonacion" th:value="${donacion.idDonacion}">
+                    
+                    <div class="form-group">
+                        <label for="nuevoEstado" class="form-label">Nuevo Estado</label>
+                        <select class="form-select" id="nuevoEstado" name="nuevoEstado" required>
+                            <option value="">Seleccione un estado...</option>
+                            <option value="Entregado">Entregado</option>
+                            <option value="Cancelado">Cancelado</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="observaciones" class="form-label">Observaciones</label>
+                        <textarea class="form-control" id="observaciones" name="observaciones" 
+                                  rows="3" placeholder="Ingrese observaciones sobre el cambio de estado..."></textarea>
+                    </div>
+
+                    <div class="d-flex gap-3">
+                        <button type="submit" class="btn btn-action btn-warning">
+                            <i class="fas fa-save"></i>
+                            <span>Guardar Cambios</span>
+                        </button>
+                        <a th:href="@{/donaciones/ver/{id}(id=${donacion.idDonacion})}" 
+                           class="btn btn-action btn-secondary">
+                            <i class="fas fa-times"></i>
+                            <span>Cancelar</span>
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

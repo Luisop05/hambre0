@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Lista de Donaciones</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        .filter-section {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .filter-controls {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+        }
+        .filter-group {
+            flex: 1;
+        }
+        .actions-group {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        .btn i {
+            font-size: 1rem;
+        }
+        .btn-filter {
+            background-color: #17a2b8;
+            color: white;
+            border: none;
+        }
+        .btn-filter:hover {
+            background-color: #138496;
+            transform: translateY(-1px);
+        }
+        .btn-clean {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+        }
+        .btn-clean:hover {
+            background-color: #5a6268;
+        }
+        .btn-new {
+            background-color: #28a745;
+            color: white;
+            border: none;
+        }
+        .btn-new:hover {
+            background-color: #218838;
+            transform: translateY(-1px);
+        }
+        .form-select {
+            border-radius: 6px;
+            border: 1px solid #ced4da;
+            padding: 8px 12px;
+            width: 100%;
+        }
+        .form-select:focus {
+            border-color: #17a2b8;
+            box-shadow: 0 0 0 0.2rem rgba(23, 162, 184, 0.25);
+        }
+        .form-label {
+            color: #495057;
+            font-weight: 500;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .page-header {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #28a745;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .page-header i {
+            color: #28a745;
+            font-size: 1.8rem;
+        }
+        .badge {
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-radius: 20px;
+        }
+        .badge-pendiente {
+            background-color: #ffc107;
+            color: #000;
+        }
+        .badge-entregado {
+            background-color: #28a745;
+            color: #fff;
+        }
+        .table {
+            background-color: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .table-header {
+            background-color: #f8f9fa;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        .table-header th {
+            padding: 15px;
+            border-bottom: 2px solid #dee2e6;
+        }
+        .table td {
+            padding: 12px 15px;
+            vertical-align: middle;
+        }
+        .table-hover tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        .table-actions {
+            white-space: nowrap;
+        }
+        .table-actions .btn {
+            margin: 0 3px;
+            padding: 5px 10px;
+            border-radius: 6px;
+        }
+        .link-donante, .link-receptor {
+            color: #17a2b8;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .link-donante:hover, .link-receptor:hover {
+            color: #138496;
+            text-decoration: underline;
+        }
+        .calorias {
+            font-weight: 500;
+            color: #28a745;
+        }
+        .empty-message {
+            padding: 30px;
+            text-align: center;
+            color: #6c757d;
+            font-size: 1.1rem;
+        }
+        .empty-message i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #dee2e6;
+        }
+        .btn-back {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        .btn-back:hover {
+            background-color: #5a6268;
+            transform: translateY(-1px);
+        }
+        .btn-action {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+            margin: 0 3px;
+        }
+        .btn-action:hover {
+            transform: translateY(-1px);
+        }
+        .btn-action i {
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div th:fragment="content">
+        <div class="container mt-4">
+            <h2 class="page-header">
+                <i class="fas fa-gift"></i>
+                <span>Lista de Donaciones</span>
+            </h2>
+
+            <!-- Filtros -->
+            <div class="filter-section">
+                <form th:action="@{/donaciones}" method="get">
+                    <div class="filter-controls">
+                        <div class="filter-group">
+                            <label for="estado" class="form-label">
+                                <i class="fas fa-filter"></i> Filtrar por Estado
+                            </label>
+                            <select class="form-select" id="estado" name="estado">
+                                <option value="">Todos los estados</option>
+                                <option value="Pendiente" th:selected="${estadoFiltro == 'Pendiente'}">Pendiente</option>
+                                <option value="Entregado" th:selected="${estadoFiltro == 'Entregado'}">Entregado</option>
+                            </select>
+                        </div>
+                        <div class="actions-group">
+                            <button type="submit" class="btn btn-filter btn-action">
+                                <i class="fas fa-search"></i>
+                                <span>Buscar</span>
+                            </button>
+                            <a th:href="@{/donaciones}" class="btn btn-clean btn-action">
+                                <i class="fas fa-sync-alt"></i>
+                                <span>Refrescar</span>
+                            </a>
+                            <a th:href="@{/donaciones/nueva}" class="btn btn-new btn-action">
+                                <i class="fas fa-plus"></i>
+                                <span>Nueva Donación</span>
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Tabla de Donaciones -->
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-header">
+                        <tr>
+                            <th>ID</th>
+                            <th>Fecha</th>
+                            <th>Donante</th>
+                            <th>Receptor</th>
+                            <th>Estado</th>
+                            <th>Calorías</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="donacion : ${donaciones}">
+                            <td>
+                                <span class="fw-bold" th:text="${donacion.idDonacion}"></span>
+                            </td>
+                            <td>
+                                <i class="far fa-calendar-alt text-muted"></i>
+                                <span th:text="${#temporals.format(donacion.fecha, 'dd/MM/yyyy')}"></span>
+                            </td>
+                            <td>
+                                <i class="fas fa-user text-primary"></i>
+                                <a th:href="@{/donantes/ver/{id}(id=${donacion.donante.idDonante})}" 
+                                   th:text="${donacion.donante.nombre}"
+                                   class="link-donante"></a>
+                            </td>
+                            <td>
+                                <i class="fas fa-user-friends text-success"></i>
+                                <a th:href="@{/receptores/ver/{id}(id=${donacion.receptor.idReceptor})}" 
+                                   th:text="${donacion.receptor.nombre}"
+                                   class="link-receptor"></a>
+                            </td>
+                            <td>
+                                <span th:class="${'badge ' + 
+                                    (donacion.estado == 'Pendiente' ? 'badge-pendiente' : 
+                                     donacion.estado == 'Entregado' ? 'badge-entregado' : 'bg-secondary')}"
+                                      th:text="${donacion.estado}">
+                                </span>
+                            </td>
+                            <td class="calorias">
+                                <i class="fas fa-fire text-danger"></i>
+                                <span th:text="${#numbers.formatDecimal(donacion.totalCalorias ?: 0, 0, 'COMMA', 2, 'POINT')}"></span>
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a th:href="@{/donaciones/ver/{id}(id=${donacion.idDonacion})}" 
+                                       class="btn btn-action btn-info text-white" 
+                                       title="Ver detalles">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a th:if="${donacion.estado == 'Pendiente'}"
+                                       th:href="@{/donaciones/actualizar-estado/{id}(id=${donacion.idDonacion})}" 
+                                       class="btn btn-action btn-warning" 
+                                       title="Actualizar estado">
+                                        <i class="fas fa-sync-alt"></i>
+                                    </a>
+                                    <a th:href="@{/donaciones/eliminar/{id}(id=${donacion.idDonacion})}" 
+                                       class="btn btn-action btn-danger"
+                                       onclick="return confirm('¿Está seguro de eliminar esta donación?')"
+                                       title="Eliminar">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(donaciones)}">
+                            <td colspan="7" class="empty-message">
+                                <div>
+                                    <i class="fas fa-box-open"></i>
+                                    <p>No hay donaciones registradas</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Botón Volver -->
+            <div class="mt-4">
+                <a th:href="@{/}" class="btn btn-action btn-secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Volver</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

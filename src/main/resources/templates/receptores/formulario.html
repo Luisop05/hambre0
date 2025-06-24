@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/layout :: head(title=${receptor.idReceptor == null ? 'Nuevo Receptor' : 'Editar Receptor'})"></head>
+<body>
+    <div th:replace="fragments/layout :: header"></div>
+    
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="card-title mb-0" th:text="${receptor.idReceptor == null ? 'Nuevo Receptor' : 'Editar Receptor'}">
+                            Nuevo/Editar Receptor
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/receptores/guardar}" th:object="${receptor}" method="post">
+                            <input type="hidden" th:field="*{idReceptor}" />
+                            
+                            <div class="mb-3">
+                                <label for="nombre" class="form-label">Nombre</label>
+                                <input type="text" class="form-control" id="nombre" th:field="*{nombre}"
+                                       th:classappend="${#fields.hasErrors('nombre')} ? 'is-invalid'" />
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('nombre')}"
+                                     th:errors="*{nombre}">Error en el nombre</div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="tipoDocumento" class="form-label">Tipo de Documento</label>
+                                    <select class="form-select" id="tipoDocumento" th:field="*{tipoDocumento}"
+                                            th:classappend="${#fields.hasErrors('tipoDocumento')} ? 'is-invalid'">
+                                        <option value="">Seleccione...</option>
+                                        <option value="DNI">DNI</option>
+                                        <option value="CE">Carné de Extranjería</option>
+                                        <option value="PASAPORTE">Pasaporte</option>
+                                    </select>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('tipoDocumento')}"
+                                         th:errors="*{tipoDocumento}">Error en el tipo de documento</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="numeroDocumento" class="form-label">Número de Documento</label>
+                                    <input type="text" class="form-control" id="numeroDocumento" th:field="*{numeroDocumento}"
+                                           th:classappend="${#fields.hasErrors('numeroDocumento')} ? 'is-invalid'" />
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('numeroDocumento')}"
+                                         th:errors="*{numeroDocumento}">Error en el número de documento</div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="direccion" class="form-label">Dirección</label>
+                                <input type="text" class="form-control" id="direccion" th:field="*{direccion}"
+                                       th:classappend="${#fields.hasErrors('direccion')} ? 'is-invalid'" />
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('direccion')}"
+                                     th:errors="*{direccion}">Error en la dirección</div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="telefono" class="form-label">Teléfono</label>
+                                    <input type="tel" class="form-control" id="telefono" th:field="*{telefono}"
+                                           th:classappend="${#fields.hasErrors('telefono')} ? 'is-invalid'" />
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('telefono')}"
+                                         th:errors="*{telefono}">Error en el teléfono</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" th:field="*{email}"
+                                           th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'" />
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}"
+                                         th:errors="*{email}">Error en el email</div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="zonaEntrega" class="form-label">Zona de Entrega</label>
+                                <select class="form-select" id="zonaEntrega" th:field="*{zonaEntrega}"
+                                        th:classappend="${#fields.hasErrors('zonaEntrega')} ? 'is-invalid'">
+                                    <option value="">Seleccione una zona...</option>
+                                    <option th:each="zona : ${zonas}"
+                                            th:value="${zona.idZona}"
+                                            th:text="${zona.nombreZona + ' - ' + zona.ciudad}">
+                                        Zona
+                                    </option>
+                                </select>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('zonaEntrega')}"
+                                     th:errors="*{zonaEntrega}">Error en la zona de entrega</div>
+                            </div>
+                            
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a th:href="@{/receptores}" class="btn btn-secondary me-md-2">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Guardar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="fragments/layout :: footer"></div>
+    <div th:replace="fragments/layout :: scripts"></div>
+</body>
+</html> 
