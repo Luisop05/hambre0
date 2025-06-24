@@ -150,10 +150,40 @@ git clone https://github.com/Luisop05/hambre0.git
 cd hambre0
 ```
 
-2. Configurar la base de datos:
-```sql
-CREATE DATABASE hambre_cero;
-```
+2. Configuración de MySQL:
+
+   a. Iniciar sesión como root en MySQL:
+   ```bash
+   # En Windows (desde CMD como administrador)
+   mysql -u root -p
+
+   # En macOS
+   mysql -u root -p
+   # O si usas Homebrew
+   mysql -u root
+   ```
+
+   b. Crear un nuevo usuario y asignar permisos:
+   ```sql
+   -- Crear usuario (reemplaza 'tu_usuario' y 'tu_contraseña')
+   CREATE USER 'tu_usuario'@'localhost' IDENTIFIED BY 'tu_contraseña';
+
+   -- Dar permisos al usuario sobre la base de datos
+   GRANT ALL PRIVILEGES ON hambre_cero.* TO 'tu_usuario'@'localhost';
+
+   -- Aplicar los cambios
+   FLUSH PRIVILEGES;
+   ```
+
+   c. Crear la base de datos:
+   ```sql
+   CREATE DATABASE hambre_cero;
+   ```
+
+   d. Salir de MySQL:
+   ```sql
+   EXIT;
+   ```
 
 3. Configurar `application.properties`:
 ```properties
